@@ -1,0 +1,75 @@
+# 🔹 Configuration
+git config --global user.name "Your Name"         # Set username
+git config --global user.email "you@example.com"  # Set email
+git config --list                                 # View config
+
+# 🔹 Create / Clone Repos
+git init                                          # Init repo
+git clone https://github.com/user/repo.git        # Clone repo
+
+# 🔹 Stage & Commit
+git status                                        # Check status
+git add file.txt                                  # Stage file
+git add .                                         # Stage all
+git commit -m "Message"                           # Commit
+
+# 🔹 Branching
+git branch                                        # List branches
+git branch new-feature                            # Create branch
+git checkout new-feature                          # Switch branch
+git switch new-feature                            # (New syntax)
+git merge new-feature                             # Merge branch
+git branch -d new-feature                         # Delete branch
+
+# 🔹 Remote
+git remote -v                                     # Show remotes
+git remote add origin <url>                       # Add remote
+git push -u origin main                           # Push first time
+git pull                                          # Pull changes
+git fetch                                         # Fetch without merge
+
+# 🔹 Undo / Reset
+git restore file.txt                              # Undo local changes
+git reset --soft HEAD~1                           # Undo last commit (keep changes)
+git reset --hard HEAD~1                           # Undo last commit (discard changes)
+
+# 🔹 Logs
+git log                                           # Commit history
+git log --oneline --graph --decorate              # Pretty log
+# 🔹 Authentication
+gh auth login                                     # Login
+gh auth logout                                    # Logout
+
+# 🔹 Repo Management
+gh repo clone user/repo                           # Clone repo
+gh repo create myrepo --public                    # Create repo
+gh repo fork                                      # Fork repo
+gh repo view                                      # View details
+
+# 🔹 Issues
+gh issue list                                     # List issues
+gh issue view 12                                  # View issue #12
+gh issue create                                   # Create issue
+gh issue close 12                                 # Close issue
+
+# 🔹 Pull Requests
+gh pr list                                        # List PRs
+gh pr view 5                                      # View PR #5
+gh pr create --fill                               # Create PR from branch
+gh pr checkout 5                                  # Checkout PR branch
+gh pr merge 5 --merge                             # Merge PR
+
+# 🔹 Actions
+gh workflow list                                  # List workflows
+gh workflow run <workflow.yml>                    # Run workflow
+gh run list                                       # List runs
+gh run view <run-id>                              # View run details
+
+# 🔹 Gists
+gh gist create file.txt                           # Create gist
+gh gist list                                      # List gists
+gh gist view <gist-id>                            # View gist
+
+# 🔹 Notifications
+gh notification list                              # List notifications
+gh notification mark-read                         # Mark all read

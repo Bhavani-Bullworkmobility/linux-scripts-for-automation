@@ -1,0 +1,20 @@
+# Basics
+docker --version                      # Version
+docker ps / docker ps -a               # Running / All containers
+docker images                          # List images
+docker pull <image>                    # Download image
+docker run -it <image> /bin/bash       # Run interactively
+docker start|stop|rm <container_id>    # Start/Stop/Remove container
+docker rmi <image_id>                  # Remove image
+
+# Build & Push
+docker build -t myapp:1.0 .            # Build image
+docker tag myapp:1.0 user/myapp:1.0    # Tag image
+docker push user/myapp:1.0             # Push to registry
+docker login                           # Docker Hub login
+
+# Volumes & Networks
+docker volume create myvol             # Create volume
+docker network create mynet            # Create network
+docker run -v myvol:/data myimage       # Mount volume
+docker run --network=mynet myimage     # Use network

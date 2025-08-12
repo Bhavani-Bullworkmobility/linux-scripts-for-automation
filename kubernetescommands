@@ -1,0 +1,22 @@
+# Cluster Info
+kubectl version --short                # kubectl version
+kubectl cluster-info                   # Cluster details
+kubectl get nodes                      # Nodes list
+kubectl get pods [-A]                   # Pods (all namespaces)
+kubectl get svc                        # Services
+kubectl get deploy                     # Deployments
+
+# Deployment
+kubectl create -f file.yaml             # Create from YAML
+kubectl apply -f file.yaml              # Apply changes
+kubectl delete -f file.yaml             # Delete resource
+kubectl scale deploy myapp --replicas=3 # Scale
+kubectl rollout status deploy/myapp     # Rollout status
+kubectl rollout undo deploy/myapp       # Rollback
+
+# Debugging
+kubectl describe pod <pod>              # Pod details
+kubectl logs <pod>                      # Logs
+kubectl exec -it <pod> -- /bin/bash     # Pod shell
+kubectl top pods                        # Resource usage
+kubectl get events                      # Events

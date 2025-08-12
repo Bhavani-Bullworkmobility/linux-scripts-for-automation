@@ -1,0 +1,5 @@
+java -jar jenkins-cli.jar -s http://localhost:8080/ help   # List commands
+java -jar jenkins-cli.jar -s <url> build my-job            # Trigger job
+java -jar jenkins-cli.jar -s <url> list-jobs               # List jobs
+java -jar jenkins-cli.jar -s <url> get-job my-job          # Get job config
+java -jar jenkins-cli.jar -s <url> create-job new-job < config.xml

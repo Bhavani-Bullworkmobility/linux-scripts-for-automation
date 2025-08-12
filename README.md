@@ -16,18 +16,7 @@ A collection of useful Bash scripts for Linux system administration.
    ```bash
    git clone https://github.com/YOUR-USERNAME/linux-admin-scripts.git
    cd linux-admin-scripts/scripts
-chmod +x *.sh
-./update_upgrade.sh
+2. chmod +x *.sh
+3 ./update_upgrade.sh
 Save & exit.
 
----
-
-## **8️⃣ Push to GitHub**
-From inside `linux-admin-scripts` folder:
-```bash
-git init
-git add .
-git commit -m "Initial commit with scripts and cheatsheet"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/linux-admin-scripts.git
-git push -u origin main

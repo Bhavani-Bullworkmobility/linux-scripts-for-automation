@@ -1,0 +1,6 @@
+ansible all -m ping                      # Test connection
+ansible-playbook site.yml                # Run playbook
+ansible-inventory --list                 # Show inventory
+ansible-vault encrypt secrets.yml        # Encrypt file
+ansible-vault decrypt secrets.yml        # Decrypt file
+ansible all -m shell -a "uptime"         # Run shell command

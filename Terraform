@@ -1,0 +1,15 @@
+# Basics
+terraform --version                    # Version
+terraform init                         # Init working dir
+terraform validate                     # Syntax check
+terraform fmt                          # Format code
+terraform plan                         # Preview changes
+terraform apply [-auto-approve]        # Apply changes
+terraform destroy                      # Destroy infra
+terraform output                       # Show outputs
+
+# State & Workspaces
+terraform state list                   # List resources in state
+terraform workspace list               # List workspaces
+terraform workspace new dev            # Create workspace
+terraform workspace select dev         # Switch workspace

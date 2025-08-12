@@ -1,0 +1,8 @@
+gcloud auth login                        # Login
+gcloud config set project <PROJECT_ID>   # Set project
+gcloud compute instances list            # List VMs
+gcloud compute instances create my-vm    # Create VM
+gcloud compute ssh my-vm                 # SSH into VM
+gcloud storage buckets list              # List buckets
+gcloud storage buckets create gs://name  # Create bucket
+gcloud projects list                     # List projects
