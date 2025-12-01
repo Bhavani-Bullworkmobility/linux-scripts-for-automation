@@ -73,4 +73,3 @@ gh gist view <gist-id>                            # View gist
 # 🔹 Notifications
 gh notification list                              # List notifications
 gh notification mark-read                         # Mark all read
- git remote add upstream https://<URL>
