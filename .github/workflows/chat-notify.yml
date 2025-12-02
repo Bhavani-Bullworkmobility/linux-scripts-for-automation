@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Determine Environment
         id: env
         run: |
@@ -45,8 +46,8 @@ jobs:
             **Environment:** ${{ steps.env.outputs.stage_name }}
             **Triggered By:** ${{ github.actor }}
             **Workflow:** ${{ github.workflow }}
-            **Commit:** ${{ github.sha }}
+            **Commit SHA:** ${{ github.sha }}
 
-            🕒 **Time (UTC):** ${{ github.event.repository.updated_at }}
+            🕒 **Timestamp (UTC):** ${{ github.event.repository.updated_at }}
 
             🔗 **View Workflow:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
