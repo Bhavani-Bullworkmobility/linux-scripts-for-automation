@@ -4,10 +4,15 @@ on:
   push:
     branches:
       - "main"
-      - "release"
-      - "stage"
-      - "development"
+      - "Release"
+      - "Stage"
+      - "Development"
   pull_request:
+    branches:
+      - "main"
+      - "Release"
+      - "Stage"
+      - "Development"
     types: [opened, reopened, closed]
 
 jobs:
@@ -20,11 +25,11 @@ jobs:
         run: |
           if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
             echo "stage_name=Main" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF_NAME}" == "release" ]]; then
+          elif [[ "${GITHUB_REF_NAME}" == "Release" ]]; then
             echo "stage_name=Release" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF_NAME}" == "stage" ]]; then
+          elif [[ "${GITHUB_REF_NAME}" == "Stage" ]]; then
             echo "stage_name=Stage" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF_NAME}" == "development" ]]; then
+          elif [[ "${GITHUB_REF_NAME}" == "Development" ]]; then
             echo "stage_name=Development" >> $GITHUB_OUTPUT
           else
             echo "stage_name=Unknown" >> $GITHUB_OUTPUT
