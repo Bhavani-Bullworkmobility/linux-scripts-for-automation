@@ -20,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Determine Environment
         id: env
         run: |
@@ -40,7 +39,7 @@ jobs:
         uses: google-github-actions/send-google-chat-webhook@v0.0.2
         with:
           webhook_url: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
-          message: |
+          text: |
             **Repository:** ${{ github.repository }}
             **Branch:** ${{ github.ref_name }}
             **Environment:** ${{ steps.env.outputs.stage_name }}
@@ -48,6 +47,6 @@ jobs:
             **Workflow:** ${{ github.workflow }}
             **Commit SHA:** ${{ github.sha }}
 
-            🕒 **Timestamp (UTC):** ${{ github.event.repository.updated_at }}
+            🕒 **Time (UTC):** ${{ github.event.head_commit.timestamp }}
 
             🔗 **View Workflow:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
