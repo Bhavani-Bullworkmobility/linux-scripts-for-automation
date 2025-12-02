@@ -1,0 +1,27 @@
+name: Notify Google Chat
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    types: [opened, reopened, closed]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send notification to Google Chat
+        uses: google-github-actions/send-google-chat-webhook@v0.0.2
+        with:
+          webhook_url: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
+          message: |
+            **Repository:** ${{ github.repository }}
+            **Branch:** ${{ github.ref_name }}
+            **Triggered By:** ${{ github.actor }}
+            **Workflow:** ${{ github.workflow }}
+            **Commit:** ${{ github.sha }}
+
+            🕒 **Time (UTC):** ${{ github.event.repository.updated_at }}
+
+            🔗 **View Workflow:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
