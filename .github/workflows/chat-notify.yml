@@ -1,52 +1,181 @@
-name: Notify Google Chat
+name: SonarQube Scan, Deploy & Notify
 
 on:
   push:
     branches:
-      - "main"
-      - "Release"
-      - "Stage"
-      - "Development"
-  pull_request:
-    branches:
-      - "main"
-      - "Release"
-      - "Stage"
-      - "Development"
-    types: [opened, reopened, closed]
+      - main
+      - Release
+      - Stage
+      - Development
 
 jobs:
-  notify:
+  sonar-deploy:
+    # ✅ Run ONLY for merge commits
+    if: startsWith(github.event.head_commit.message, 'Merge pull request')
+
     runs-on: ubuntu-latest
+    name: Lint → SonarQube → Deploy → Notify
 
     steps:
-      - name: Determine Environment
+      # --------------------
+      # 🧩 CHECKOUT CODE
+      # --------------------
+      - name: 🧩 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # --------------------
+      # 🌱 DETERMINE ENVIRONMENT
+      # --------------------
+      - name: 🌱 Determine Environment
         id: env
         run: |
-          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-            echo "stage_name=Main" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF_NAME}" == "Release" ]]; then
-            echo "stage_name=Release" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF_NAME}" == "Stage" ]]; then
-            echo "stage_name=Stage" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF_NAME}" == "Development" ]]; then
-            echo "stage_name=Development" >> $GITHUB_OUTPUT
-          else
-            echo "stage_name=Unknown" >> $GITHUB_OUTPUT
+          case "${GITHUB_REF_NAME}" in
+            main)
+              echo "stage_name=Main" >> $GITHUB_OUTPUT
+              ;;
+            Release)
+              echo "stage_name=Release" >> $GITHUB_OUTPUT
+              ;;
+            Stage)
+              echo "stage_name=Stage" >> $GITHUB_OUTPUT
+              ;;
+            Development)
+              echo "stage_name=Development" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "stage_name=Unknown" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      # --------------------
+      # 🐍 SETUP PYTHON
+      # --------------------
+      - name: ⚙️ Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # --------------------
+      # 📦 INSTALL DEPENDENCIES
+      # --------------------
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip --quiet
+          pip install -r requirements.txt --quiet || echo "⚠️ requirements.txt missing — skipping."
+
+      # --------------------
+      # 🧹 LINT (FAIL PIPELINE IF ERRORS)
+      # --------------------
+      - name: 🧹 Run Lint (fail on errors)
+        run: |
+          pip install flake8 --quiet
+
+          echo "🔍 Running flake8..."
+          flake8 . > lint_raw.txt || true
+
+          ERRORS=$(grep -E " (E|F)[0-9]+" lint_raw.txt | wc -l | tr -d ' ')
+          WARNINGS=$(grep -E " W[0-9]+" lint_raw.txt | wc -l | tr -d ' ')
+
+          echo ""
+          echo "==================== 🧹 LINT SUMMARY ===================="
+          echo "Errors   : ${ERRORS}"
+          echo "Warnings : ${WARNINGS}"
+          echo "========================================================="
+          echo ""
+
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "❌ Lint errors found. Stopping pipeline."
+            exit 1
           fi
 
-      - name: Send notification to Google Chat
+          echo "✅ No lint errors. Proceeding."
+
+      # --------------------
+      # 🔍 SONARQUBE SCAN
+      # --------------------
+      - name: 🔍 Run SonarQube Scanner
+        uses: SonarSource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=Trinetra-Parser
+            -Dsonar.projectName=Trinetra-Parser
+            -Dsonar.sources=.
+            -Dsonar.language=py
+            -Dsonar.python.version=3.11
+            -Dsonar.verbose=false
+
+      # --------------------
+      # ✅ QUALITY GATE CHECK
+      # --------------------
+      - name: ✅ Check Quality Gate
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      # --------------------
+      # 🔐 AUTHENTICATE WITH GCP
+      # --------------------
+      - name: 🔐 Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # --------------------
+      # ☁️ SETUP GCLOUD
+      # --------------------
+      - name: ☁️ Set up gcloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: trinetra-f5eeb
+          install_components: kubectl
+
+      # --------------------
+      # 🚀 TRIGGER CLOUD BUILD
+      # --------------------
+      - name: 🚀 Trigger Cloud Build
+        run: |
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+
+          BUILD_ID=$(gcloud builds submit \
+            --config=cloudbuild.yaml \
+            --substitutions=_COMMIT_SHA="${SHORT_SHA}" \
+            --format="value(id)" \
+            --quiet)
+
+          STATUS=$(gcloud builds describe "$BUILD_ID" --format="value(status)")
+
+          if [[ "$STATUS" != "SUCCESS" ]]; then
+            echo "❌ Deployment failed"
+            exit 1
+          fi
+
+          echo "🎉 Deployment SUCCESS"
+
+      # --------------------
+      # 💬 GOOGLE CHAT NOTIFICATION
+      # --------------------
+      - name: 💬 Notify Google Chat
+        if: always()
         uses: google-github-actions/send-google-chat-webhook@v0.0.2
         with:
           webhook_url: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
           text: |
+            🚀 **Pipeline Status**
+
             **Repository:** ${{ github.repository }}
             **Branch:** ${{ github.ref_name }}
             **Environment:** ${{ steps.env.outputs.stage_name }}
             **Triggered By:** ${{ github.actor }}
             **Workflow:** ${{ github.workflow }}
             **Commit SHA:** ${{ github.sha }}
+            **Result:** ${{ job.status }}
 
             🕒 **Time (UTC):** ${{ github.event.head_commit.timestamp }}
 
-            🔗 **View Workflow:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            🔗 **View Run:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
