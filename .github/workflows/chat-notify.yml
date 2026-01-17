@@ -128,7 +128,7 @@ jobs:
 
       # --------------------
       # ☁️ SETUP GCLOUD
-      # --------------------
+      # -------------------
       - name: ☁️ Set up gcloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
