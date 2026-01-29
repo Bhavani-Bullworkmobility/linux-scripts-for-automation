@@ -38,4 +38,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Success
-        run: echo "The check passed. Put your next steps here."
+        run: echo "The check passed. Put your next steps here..."
