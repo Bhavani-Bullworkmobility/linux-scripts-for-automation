@@ -2,9 +2,7 @@ name: PR Merge Guard
 on:
   push:
     branches:
-      - Development
-      - Stage
-      - Release
+      - main
 
 jobs:
   gatekeeper:
