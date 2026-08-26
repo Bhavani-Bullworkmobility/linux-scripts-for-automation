@@ -1,8 +1,10 @@
 name: PR Merge Guard
+
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   gatekeeper:
